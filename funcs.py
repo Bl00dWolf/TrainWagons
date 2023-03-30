@@ -40,9 +40,22 @@ def get_data_from_QRCode_image(filename: str) -> str:
 
 def crypt_data(data: str) -> bytes:
     cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
-    return cipher.encrypt(f"{data}".encode(encoding='UTF-8'))
+    return cipher.encrypt(data.encode(encoding='UTF-8'))
 
 
 def decrypt_data(data: bytes) -> dict | str:
     cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
     return cipher.decrypt(data).decode(encoding='UTF-8')
+
+
+def make_dict_from_data(raw_data: str) -> dict:
+    data = {}
+    for line in raw_data.split('\n'):
+        if line.find(' = ') != -1:
+            try:
+                city, wagons = line.split(' = ')[0], int(line.split(' = ')[1])
+                data[city] = data.setdefault(city, 0) + wagons
+            except ValueError:
+                print(f'Ошибка в строке, строка пропущена из обработки: {line}')
+    print('\n')
+    return data

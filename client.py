@@ -1,6 +1,6 @@
+import funcs
 import json
 import time
-import funcs
 import socket
 
 # В цикле запускаем вывод консольного меню с вариантами ответов
@@ -34,11 +34,14 @@ while True:
     elif choice == 2:
         # TODO доработать функцию в нормальный вид из тестовго, убрать отладку
         filename = input('Введите полный путь до QRCode файла:\n')
-        data = funcs.get_data_from_QRCode_image(filename)
-        print(f'repr = {repr(data)}')
+        raw_data = funcs.get_data_from_QRCode_image(filename)
+        data = funcs.make_dict_from_data(raw_data)
+        print('data python = ', data)
 
-        data = funcs.crypt_data(data)
-        print(f'crypted = {data}')
+        print('data json = ', json.dumps(data))
+        data = funcs.crypt_data(json.dumps(data))
+        print(f'crypted json = {data}')
 
         data = funcs.decrypt_data(data)
-        print(f'decrypted = {repr(data)}')
+        print(f'decrypted json = {data}')
+        print(f'decrypted python = {json.loads(data)}')
