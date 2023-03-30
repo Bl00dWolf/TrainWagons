@@ -39,4 +39,4 @@ while True:
     cur_data = funcs.srv_read_json(SRV_RECORDS_FILE)  # читаем текущий файл json если он есть
     # пишем в файл новые значения, дополняя если надо старые
     funcs.srv_write_json(SRV_RECORDS_FILE, cur_data, norm_data)
-    print('[INFO] Новые данные записаны в файл')
+    print(f'[INFO] Новые данные записаны в файл от хоста {ip_addr}')
