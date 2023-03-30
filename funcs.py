@@ -99,7 +99,7 @@ def send_data_to_server(crypted_data: bytes) -> None:
         return
 
     print('Передаем данные\n')
-    client.send(b'<START_OF_DATA_FILE>')
+    # client.send(b'<START_OF_DATA_FILE>')
     client.sendall(crypted_data)
     client.send(b'<END_OF_DATA_FILE>')
     client.close()

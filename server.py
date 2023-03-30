@@ -22,12 +22,12 @@ while not done:
     data = client.recv(1024)
     if data[-18:] == b'<END_OF_DATA_FILE>':
         done = True
-    else:
-        crypt_data += data
-
-print(crypt_data)
-print(funcs.decrypt_data(crypt_data))
+    crypt_data += data
 
 client.close()
 server.close()
+
+norm_data = funcs.decrypt_data(crypt_data[:-18])
+norm_data = json.loads(norm_data)
+print(norm_data)
 
