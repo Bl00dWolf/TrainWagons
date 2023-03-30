@@ -1,7 +1,8 @@
 import qrcode
 import cv2
+import socket
 from Crypto.Cipher import AES
-from config import AES_KEY, AES_NONCE
+from config import AES_KEY, AES_NONCE, CLIENT_IP, CLIENT_PORT
 import json
 
 
@@ -87,3 +88,18 @@ def make_dict_from_data(raw_data: str) -> dict:
                 print(f'Ошибка в строке, строка пропущена из обработки: {line}')
     print('\n')
     return data
+
+
+def send_data_to_server(crypted_data: bytes) -> None:
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP интернет сокет
+    try:
+        client.connect((CLIENT_IP, CLIENT_PORT))  # коннектимся по ип и по порту
+    except ConnectionRefusedError:
+        print('Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
+        return
+
+    print('Передаем данные\n')
+    client.send(b'<START_OF_DATA_FILE>')
+    client.sendall(crypted_data)
+    client.send(b'<END_OF_DATA_FILE>')
+    client.close()

@@ -32,16 +32,20 @@ while True:
         funcs.make_qrcode_datafile(filename, path)
         time.sleep(2)
     elif choice == 2:
-        # TODO доработать функцию в нормальный вид из тестовго, убрать отладку
         filename = input('Введите полный путь до QRCode файла:\n')
-        raw_data = funcs.get_data_from_QRCode_image(filename)
-        data = funcs.make_dict_from_data(raw_data)
-        print('data python = ', data)
 
-        print('data json = ', json.dumps(data))
-        data = funcs.crypt_data(json.dumps(data))
-        print(f'crypted json = {data}')
+        print('Считываем данные из файла\n')
+        raw_data = funcs.get_data_from_QRCode_image(filename)  # считываем сырые данные из файла
 
-        data = funcs.decrypt_data(data)
-        print(f'decrypted json = {data}')
-        print(f'decrypted python = {json.loads(data)}')
+        print('Преобразуем данные\n')
+        data = funcs.make_dict_from_data(raw_data)  # преобразуем в питоновский словарь
+
+        print('Шифруем данные\n')
+        crypted_data = funcs.crypt_data(json.dumps(data))  # преобразуем в json и криптуем через AES
+
+        print('Подключаемся к серверу\n')
+        funcs.send_data_to_server(crypted_data)
+
+        # data = funcs.decrypt_data(crypted_data)
+        # print(f'decrypted json = {data}')
+        # print(f'decrypted python = {json.loads(data)}')
