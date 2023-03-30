@@ -8,6 +8,12 @@ import json
 # Этот файл содержит в себе все основные функции для работы программы
 
 def make_qrcode_datafile(filename: str, path: str) -> None:
+    """
+    Преобразует сырые данные, согласно шаблона, из файла в изображение с QR кодом и сохраняет его на диск
+    :param filename: файл с сырыми данными, небоходимо указать полный путь, включая имя самого файла
+    :param path: путь для сохранения изображения с qr code, включая имя файла
+    :return: None
+    """
     # Готовим строку с данными
     data = ''
     try:
@@ -29,6 +35,11 @@ def make_qrcode_datafile(filename: str, path: str) -> None:
 
 
 def get_data_from_QRCode_image(filename: str) -> str:
+    """
+    Считывает сырые данные из изображения с QR кодом
+    :param filename: полный путь до файла, включая имя файла
+    :return: строку с сырыми данными
+    """
     QRDetector = cv2.QRCodeDetector()
     try:
         data, *_ = QRDetector.detectAndDecode(cv2.imread(filename))
@@ -39,16 +50,33 @@ def get_data_from_QRCode_image(filename: str) -> str:
 
 
 def crypt_data(data: str) -> bytes:
+    """
+    Шифрует данные (в виде строки) с помощью AES с применением заданного ключа и возвращает зашифрованную
+    последовательность байт
+    :param data: принимает строку с данными
+    :return: возвращает зашифрованную последовательность байт
+    """
     cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
     return cipher.encrypt(data.encode(encoding='UTF-8'))
 
 
-def decrypt_data(data: bytes) -> dict | str:
+def decrypt_data(data: bytes) -> str:
+    """
+    Расшифровывает данные (в виде последовательности байтов) с помощью AES с применением заданного ключа
+    и возвращает расшифрованную строку
+    :param data: принимает зашифрованную строку в виде последовательности байт
+    :return: возвращает расшифрованную строку с данными
+    """
     cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
     return cipher.decrypt(data).decode(encoding='UTF-8')
 
 
 def make_dict_from_data(raw_data: str) -> dict:
+    """
+    Преобразует сырые данные в понятный для Python словарь
+    :param raw_data: сырые данные вида "Город" = число
+    :return: словарь вида {'Город': число}
+    """
     data = {}
     for line in raw_data.split('\n'):
         if line.find(' = ') != -1:
