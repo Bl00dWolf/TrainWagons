@@ -91,6 +91,11 @@ def make_dict_from_data(raw_data: str) -> dict:
 
 
 def send_data_to_server(crypted_data: bytes) -> None:
+    """
+    Передача байтовых данных на сервер. Последовательность завершения передачи данных - b'<EOFD>'
+    :param crypted_data: зашифрованные данные
+    :return: None
+    """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP интернет сокет
     try:
         client.connect((CLIENT_IP, CLIENT_PORT))  # коннектимся по ип и по порту
@@ -99,8 +104,8 @@ def send_data_to_server(crypted_data: bytes) -> None:
         return
 
     print('Передаем данные\n')
-    # client.send(b'<START_OF_DATA_FILE>')
+    # client.send(b'<START_OF_DATA_FILE>') # начала файла никак не обозначается. Надо ли это делать?
     client.sendall(crypted_data)
-    client.send(b'<END_OF_DATA_FILE>')
+    client.send(b'<EOFD>')
     client.close()
     print('Данные переданы успешно\n')
