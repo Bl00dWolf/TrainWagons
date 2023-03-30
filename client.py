@@ -29,3 +29,7 @@ while True:
                      'Например: C:\QRCode.png\n')
         funcs.make_qrcode_datafile(filename, path)
         time.sleep(2)
+    elif choice == 2:
+        filename = input('Введите полный путь до QRCode файла:\n')
+        data = funcs.get_data_from_QRCode_image(filename)
+        print(data)
