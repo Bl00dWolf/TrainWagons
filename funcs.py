@@ -35,6 +35,11 @@ def make_qrcode_datafile(filename: str, path: str) -> None:
         print('Не удалось сохранить изображение с QrCode. Скорее всего вы неверно задали путь для сохранения\n')
         return
 
+    # эта штука более продвинутая, как вариант, можно вывести QR Code в ASCII прямо в терминал =)
+    # qr2 = qrcode.QRCode()
+    # qr2.add_data(data)
+    # qr2.print_ascii()
+
 
 def get_data_from_QRCode_image(filename: str) -> str:
     """
