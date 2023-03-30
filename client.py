@@ -8,6 +8,7 @@ while True:
     # Печатаем нашу менюху
     print(f"""{'-' * 45}
 Выберите опцию:
+0) Выход
 1) Создать QR-кодовое изображение с данными из указанного файла
 2) Расшифровать изображение с указанным QR-кодом и передать данные на сервер
 {'-' * 45}
@@ -21,10 +22,13 @@ while True:
         time.sleep(2)
         continue
 
-    if choice < 1 or choice > 2:
+    if choice < 0 or choice > 2:
         print('Опции под таким номером нет, введите целое число соответствующее нужной опции в меню\n')
         time.sleep(2)
         continue
+    elif choice == 0:
+        print('Выход')
+        break
     elif choice == 1:
         filename = input('Введите полный путь до файла с данными:\n')
         path = input('Введите путь и имя файла для сохранения QR-кода\n'
@@ -34,18 +38,21 @@ while True:
     elif choice == 2:
         filename = input('Введите полный путь до QRCode файла:\n')
 
-        print('Считываем данные из файла\n')
+        print('Считываем данные из файла...')
         raw_data = funcs.get_data_from_QRCode_image(filename)  # считываем сырые данные из файла
+        if not raw_data:
+            continue
 
-        print('Преобразуем данные\n')
+        print('Преобразуем данные...')
         data = funcs.make_dict_from_data(raw_data)  # преобразуем в питоновский словарь
+        if not data:
+            print('Нет новых данных, завершение.')
+            continue
+        print(data)
 
-        print('Шифруем данные\n')
+        print('Шифруем данные...')
         crypted_data = funcs.crypt_data(json.dumps(data))  # преобразуем в json и криптуем через AES
 
-        print('Подключаемся к серверу\n')
+        # Подключаемся к серверу и передаем данные
+        print('Подключаемся к серверу...')
         funcs.send_data_to_server(crypted_data)
-
-        # data = funcs.decrypt_data(crypted_data)
-        # print(f'decrypted json = {data}')
-        # print(f'decrypted python = {json.loads(data)}')

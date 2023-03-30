@@ -85,7 +85,7 @@ def make_dict_from_data(raw_data: str) -> dict:
                 city, wagons = line.split(' = ')[0], int(line.split(' = ')[1])
                 data[city] = data.setdefault(city, 0) + wagons
             except ValueError:
-                print(f'Ошибка в строке, строка пропущена из обработки: {line}')
+                print(f'Ошибка в строке, строка будет пропущена: {line.strip()}')
     print('\n')
     return data
 
@@ -103,3 +103,4 @@ def send_data_to_server(crypted_data: bytes) -> None:
     client.sendall(crypted_data)
     client.send(b'<END_OF_DATA_FILE>')
     client.close()
+    print('Данные переданы успешно\n')
