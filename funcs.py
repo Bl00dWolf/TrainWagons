@@ -3,7 +3,7 @@ import cv2
 import socket
 from Crypto.Cipher import AES
 from config import AES_KEY, AES_NONCE, CLIENT_IP, CLIENT_PORT
-import json
+from Crypto.Random import get_random_bytes
 
 
 # Этот файл содержит в себе все основные функции для работы программы
@@ -50,25 +50,26 @@ def get_data_from_QRCode_image(filename: str) -> str:
     return data
 
 
-def crypt_data(data: str) -> bytes:
+def crypt_data(data: str) -> tuple[bytes, bytes]:
     """
     Шифрует данные (в виде строки) с помощью AES с применением заданного ключа и возвращает зашифрованную
     последовательность байт
     :param data: принимает строку с данными
     :return: возвращает зашифрованную последовательность байт
     """
-    cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
-    return cipher.encrypt(data.encode(encoding='UTF-8'))
+    cipher = AES.new(AES_KEY, AES.MODE_EAX, get_random_bytes(32))
+    return cipher.encrypt(data.encode(encoding='UTF-8')), cipher.nonce
 
 
-def decrypt_data(data: bytes) -> str:
+def decrypt_data(data: bytes, nonce: bytes) -> str:
     """
     Расшифровывает данные (в виде последовательности байтов) с помощью AES с применением заданного ключа
     и возвращает расшифрованную строку
+    :param nonce: сессионный nonce в виде байт 16 или 32 байта
     :param data: принимает зашифрованную строку в виде последовательности байт
     :return: возвращает расшифрованную строку с данными
     """
-    cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
+    cipher = AES.new(AES_KEY, AES.MODE_EAX, nonce)
     return cipher.decrypt(data).decode(encoding='UTF-8')
 
 

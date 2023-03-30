@@ -24,6 +24,10 @@ while True:
 
     client.close()  # закрываем коннект с клиентом текущий
 
-    norm_data = funcs.decrypt_data(crypt_data[:-6])  # декриптим обратно в json строку с помощью AES
-    norm_data = json.loads(norm_data)
+    # Декриптим обратно в json строку с помощью AES, помним что первые 32 байта это nonce для AES, для расшифровки
+    AES_nonce = crypt_data[:32]  # выдираем NONCE
+    crypt_data = crypt_data[32:-6]  # выдираем данные, без nonce и без <EOFD>
+
+    norm_data = funcs.decrypt_data(crypt_data, AES_nonce) # расшифровываем данные
+    norm_data = json.loads(norm_data) # переводим данные в словарь Python
     print(norm_data)

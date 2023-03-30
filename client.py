@@ -51,8 +51,8 @@ while True:
         print(data)
 
         print('Шифруем данные...')
-        crypted_data = funcs.crypt_data(json.dumps(data))  # преобразуем в json и криптуем через AES
+        crypted_data, AES_nonce = funcs.crypt_data(json.dumps(data))  # преобразуем в json и криптуем через AES
 
         # Подключаемся к серверу и передаем данные
         print('Подключаемся к серверу...')
-        funcs.send_data_to_server(crypted_data)
+        funcs.send_data_to_server(AES_nonce + crypted_data)  # передаем AES nonce и наши данные
