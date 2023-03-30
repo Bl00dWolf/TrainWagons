@@ -2,6 +2,7 @@ import qrcode
 import cv2
 from Crypto.Cipher import AES
 from config import AES_KEY, AES_NONCE
+import json
 
 
 # Этот файл содержит в себе все основные функции для работы программы
@@ -30,7 +31,7 @@ def make_qrcode_datafile(filename: str, path: str) -> None:
         print('Файл не найден, скорее всего вы указали неверный путь\n')
         return
 
-    qr = qrcode.make(data)
+    qr = qrcode.make(json.dumps(data))  # Заворачиваем json в QR
     try:
         qr.save(path)
     except OSError:
@@ -38,17 +39,17 @@ def make_qrcode_datafile(filename: str, path: str) -> None:
         return
 
 
-def get_data_from_QRCode_image(filename: str) -> dict:
+def get_data_from_QRCode_image(filename: str) -> str:
     QRDetector = cv2.QRCodeDetector()
     try:
         data, *_ = QRDetector.detectAndDecode(cv2.imread(filename))
     except:
         print('Ошибка чтения файла, скорее всего вы выбрали неверный файл\n')
-        return {}
-    return data
+        return ''
+    return data  # не забываем, что это json строка
 
 
-def crypt_data(data: dict) -> bytes:
+def crypt_data(data: str) -> bytes:
     cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
     return cipher.encrypt(f"{data}".encode(encoding='UTF-8'))
 

@@ -1,5 +1,7 @@
+import json
 import time
 import funcs
+import socket
 
 # В цикле запускаем вывод консольного меню с вариантами ответов
 while True:
@@ -32,4 +34,10 @@ while True:
     elif choice == 2:
         filename = input('Введите полный путь до QRCode файла:\n')
         data = funcs.get_data_from_QRCode_image(filename)
-        print(data)
+        print(f'repr = {repr(data)}')
+
+        data = funcs.crypt_data(data)
+        print(f'crypted = {data}')
+
+        data = funcs.decrypt_data(data)
+        print(f'decrypted = {json.loads(data)}')
