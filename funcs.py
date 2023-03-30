@@ -3,10 +3,15 @@ import cv2
 from config import AES_KEY, IMG_NAME
 
 
-def make_qrcode_datafile(filename: str):
+def make_qrcode_datafile(filename: str, path: str) -> None:
+    # Функция создает QRCode изображение в виде файла по указанному пути
     try:
+        data = {}
         with open(filename, encoding='UTF-8') as fl:
-            pass
+            for line in fl.readline().strip():
+                if line.find(' = ') != -1:
+                    city, wagons = line.split(' = ')[0], int(line.split(' = ')[1])
+
     except FileNotFoundError as err:
         print('Файл не найден, скорее всего вы указали неверный путь\n')
 
