@@ -32,6 +32,7 @@ while True:
         funcs.make_qrcode_datafile(filename, path)
         time.sleep(2)
     elif choice == 2:
+        # TODO доработать функцию в нормальный вид из тестовго, убрать отладку
         filename = input('Введите полный путь до QRCode файла:\n')
         data = funcs.get_data_from_QRCode_image(filename)
         print(f'repr = {repr(data)}')
@@ -40,4 +41,4 @@ while True:
         print(f'crypted = {data}')
 
         data = funcs.decrypt_data(data)
-        print(f'decrypted = {json.loads(data)}')
+        print(f'decrypted = {repr(data)}')
