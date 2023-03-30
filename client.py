@@ -26,6 +26,6 @@ while True:
     elif choice == 1:
         filename = input('Введите полный путь до файла с данными:\n')
         path = input('Введите путь и имя файла для сохранения QR-кода\n'
-                     'Например: C:\QRCode.png')
+                     'Например: C:\QRCode.png\n')
         funcs.make_qrcode_datafile(filename, path)
         time.sleep(2)
