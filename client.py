@@ -52,7 +52,6 @@ while True:
         if not data:
             print('Нет новых данных, завершение.')
             continue
-        print(data)
 
         print('Шифруем данные...')
         crypted_data, AES_nonce = funcs.crypt_data(json.dumps(data))  # преобразуем в json и криптуем через AES

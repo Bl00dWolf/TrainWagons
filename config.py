@@ -5,3 +5,4 @@ AES_KEY: bytes = b'tz$x&SI#23C46Cx@VRgqAi5wDk9JqQLx'  # Должен быть л
 CLIENT_IP, CLIENT_PORT = 'localhost', 2721
 SERVER_IP, SERVER_PORT = 'localhost', 2721
 SRV_TURNOFF_KEY = b'4[ygYqmEZ"cFx=IJ&^F+3?$HmVZR2R'
+SRV_RECORDS_FILE = 'data_file.json'  # имя файла или полный путь к файлу записей, которые создает сервер

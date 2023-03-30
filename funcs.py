@@ -1,6 +1,7 @@
 import qrcode
 import cv2
 import socket
+import json
 from Crypto.Cipher import AES
 from config import AES_KEY, CLIENT_IP, CLIENT_PORT, SRV_TURNOFF_KEY
 from Crypto.Random import get_random_bytes
@@ -111,7 +112,12 @@ def send_data_to_server(crypted_data: bytes) -> None:
     client.close()
     print('Данные переданы успешно\n')
 
-def server_exit_program():
+
+def server_exit_program() -> None:
+    """
+    Отправляет команду завершения работы программы на сервер.
+    :return: None
+    """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP интернет сокет
     try:
         client.connect((CLIENT_IP, CLIENT_PORT))  # коннектимся по ип и по порту
@@ -120,3 +126,38 @@ def server_exit_program():
         return
     print('Передаем последовательность отключения')
     client.sendall(b'<ESCOF>' + SRV_TURNOFF_KEY + b'</ESCOF>')
+
+
+def srv_read_json(json_file) -> dict:
+    """
+    Возвращает словать Python из json файла. В противном случае возвращает пустой словарь.
+    :param json_file: json файл
+    :return: словарь Python из json файла
+    """
+    data = {}
+    try:
+        with open(json_file, encoding='UTF-8') as fl:
+            try:
+                data = json.load(fl)
+            except json.JSONDecodeError:
+                print('Данные в файле повреждены и не могут быть считаны. Файл будет перезаписан на этапе записи.')
+    except FileNotFoundError:
+        print('Файла с данными нет. Он будет создан на этапе записи.')
+    return data
+
+
+def srv_write_json(json_file, cur_data: dict, new_data: dict) -> None:
+    """
+    Обноаляет старые данные, если они есть и заносит все в json файл.
+    :param json_file: файл JSON
+    :param cur_data: текущие данные из файла JSON
+    :param new_data: новые данные для записи в JSON
+    """
+    try:
+        for city, value in new_data.items():
+            cur_data[city] = cur_data.setdefault(city, 0) + new_data[city]
+        with open(json_file, 'w', encoding='UTF-8') as fl:
+            json.dump(cur_data, fl, indent=3)
+    except:
+        print(f'Не удалось создать файл. Возможно переменная конфигурации SRV_RECORDS_FILE задана наверно\n'
+              f'SRV_RECORDS_FILE = {json_file}')

@@ -2,7 +2,7 @@ import funcs
 import json
 import time
 import socket
-from config import SERVER_IP, SERVER_PORT, SRV_TURNOFF_KEY
+from config import SERVER_IP, SERVER_PORT, SRV_TURNOFF_KEY, SRV_RECORDS_FILE
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # поднимаем TCP интернет соединение
 print('Запускаем сервер...')
@@ -25,7 +25,7 @@ while True:
             done = True
         crypt_data += data  # записываем текущую порцию данных
 
-    if data.startswith(b'<ESCOF>'): # если последовательность завершения, то заканчиваем программу
+    if data.startswith(b'<ESCOF>'):  # если последовательность завершения, то заканчиваем программу
         break
     client.close()  # закрываем коннект с клиентом текущий
 
@@ -35,4 +35,8 @@ while True:
 
     norm_data = funcs.decrypt_data(crypt_data, AES_nonce)  # расшифровываем данные
     norm_data = json.loads(norm_data)  # переводим данные в словарь Python
-    print(norm_data)
+
+    cur_data = funcs.srv_read_json(SRV_RECORDS_FILE)  # читаем текущий файл json если он есть
+    # пишем в файл новые значения, дополняя если надо старые
+    funcs.srv_write_json(SRV_RECORDS_FILE, cur_data, norm_data)
+    print('[INFO] Новые данные записаны в файл')
