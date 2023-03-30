@@ -1,7 +1,10 @@
 import qrcode
 import cv2
-from config import AES_KEY, IMG_NAME
+from Crypto.Cipher import AES
+from config import AES_KEY, AES_NONCE
 
+
+# Этот файл содержит в себе все основные функции для работы программы
 
 def make_qrcode_datafile(filename: str, path: str) -> None:
     # Функция создает QRCode изображение в виде файла по указанному пути
@@ -43,3 +46,13 @@ def get_data_from_QRCode_image(filename: str) -> dict:
         print('Ошибка чтения файла, скорее всего вы выбрали неверный файл\n')
         return {}
     return data
+
+
+def crypt_data(data: dict) -> bytes:
+    cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
+    return cipher.encrypt(f"{data}".encode(encoding='UTF-8'))
+
+
+def decrypt_data(data: bytes) -> dict | str:
+    cipher = AES.new(AES_KEY, AES.MODE_EAX, AES_NONCE)
+    return cipher.decrypt(data).decode(encoding='UTF-8')
