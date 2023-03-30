@@ -3,8 +3,8 @@ import cv2
 import socket
 import json
 from Crypto.Cipher import AES
-from config import AES_KEY, CLIENT_IP, CLIENT_PORT, SRV_TURNOFF_KEY
 from Crypto.Random import get_random_bytes
+from config import AES_KEY, CLIENT_IP, CLIENT_PORT, SRV_TURNOFF_KEY
 
 
 # Этот файл содержит в себе все основные функции для работы программы

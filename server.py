@@ -1,6 +1,5 @@
 import funcs
 import json
-import time
 import socket
 from config import SERVER_IP, SERVER_PORT, SRV_TURNOFF_KEY, SRV_RECORDS_FILE
 
