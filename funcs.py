@@ -2,7 +2,7 @@ import qrcode
 import cv2
 import socket
 from Crypto.Cipher import AES
-from config import AES_KEY, AES_NONCE, CLIENT_IP, CLIENT_PORT
+from config import AES_KEY, CLIENT_IP, CLIENT_PORT, SRV_TURNOFF_KEY
 from Crypto.Random import get_random_bytes
 
 
@@ -110,3 +110,13 @@ def send_data_to_server(crypted_data: bytes) -> None:
     client.send(b'<EOFD>')
     client.close()
     print('Данные переданы успешно\n')
+
+def server_exit_program():
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP интернет сокет
+    try:
+        client.connect((CLIENT_IP, CLIENT_PORT))  # коннектимся по ип и по порту
+    except ConnectionRefusedError:
+        print('Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
+        return
+    print('Передаем последовательность отключения')
+    client.sendall(b'<ESCOF>' + SRV_TURNOFF_KEY + b'</ESCOF>')

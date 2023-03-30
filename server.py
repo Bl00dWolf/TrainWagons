@@ -2,7 +2,7 @@ import funcs
 import json
 import time
 import socket
-from config import SERVER_IP, SERVER_PORT
+from config import SERVER_IP, SERVER_PORT, SRV_TURNOFF_KEY
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # поднимаем TCP интернет соединение
 print('Запускаем сервер...')
@@ -20,14 +20,19 @@ while True:
         data = client.recv(1024)  # принимаем по 1024 байт
         if data[-6:] == b'<EOFD>':  # если видим <EOFD> значит данные закончили передавать
             done = True
+        elif data == (b'<ESCOF>' + SRV_TURNOFF_KEY + b'</ESCOF>'):
+            print('!!! Получена команда на завершение работы программы !!!')
+            done = True
         crypt_data += data  # записываем текущую порцию данных
 
+    if data.startswith(b'<ESCOF>'): # если последовательность завершения, то заканчиваем программу
+        break
     client.close()  # закрываем коннект с клиентом текущий
 
     # Декриптим обратно в json строку с помощью AES, помним что первые 32 байта это nonce для AES, для расшифровки
     AES_nonce = crypt_data[:32]  # выдираем NONCE
     crypt_data = crypt_data[32:-6]  # выдираем данные, без nonce и без <EOFD>
 
-    norm_data = funcs.decrypt_data(crypt_data, AES_nonce) # расшифровываем данные
-    norm_data = json.loads(norm_data) # переводим данные в словарь Python
+    norm_data = funcs.decrypt_data(crypt_data, AES_nonce)  # расшифровываем данные
+    norm_data = json.loads(norm_data)  # переводим данные в словарь Python
     print(norm_data)
