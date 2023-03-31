@@ -25,14 +25,14 @@ def make_qrcode_datafile(filename: str, path: str) -> None:
                 if line.find(' = ') != -1:  # Если строка соответствует нашему шаблону - добавляем в data
                     data += line
     except (FileNotFoundError, OSError):
-        print('Файл не найден, скорее всего вы указали неверный путь\n')
+        print('[ERROR] Файл не найден, скорее всего Вы указали неверный путь\n')
         return
 
     qr = qrcode.make(data)  # добавляем дату в QR код
     try:
         qr.save(path)  # пробуем сохранить изображение с QR кодом
     except OSError:
-        print('Не удалось сохранить изображение с QrCode. Скорее всего вы неверно задали путь для сохранения\n')
+        print('[ERROR] Не удалось сохранить изображение с QrCode. Скорее всего Вы неверно задали путь для сохранения\n')
         return
 
     # эта штука более продвинутая, как вариант, можно вывести QR Code в ASCII прямо в терминал =)
@@ -51,7 +51,7 @@ def get_data_from_QRCode_image(filename: str) -> str:
     try:
         data, *_ = QRDetector.detectAndDecode(cv2.imread(filename))
     except:
-        print('Ошибка чтения файла, скорее всего вы выбрали неверный файл\n')
+        print('[ERROR] Ошибка чтения файла, скорее всего Вы выбрали неверный файл\n')
         return ''
     return data
 
@@ -92,7 +92,7 @@ def make_dict_from_data(raw_data: str) -> dict:
                 city, wagons = line.split(' = ')[0], int(line.split(' = ')[1])
                 data[city] = data.setdefault(city, 0) + wagons
             except ValueError:
-                print(f'Ошибка в строке, строка будет пропущена: {line.strip()}')
+                print(f'[ERROR] Ошибка в строке, строка будет пропущена: {line.strip()}')
     print('\n')
     return data
 
@@ -107,7 +107,7 @@ def send_data_to_server(crypted_data: bytes) -> None:
     try:
         client.connect((CLIENT_IP, CLIENT_PORT))  # коннектимся по ип и по порту
     except ConnectionRefusedError:
-        print('Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
+        print('[ERROR] Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
         return
 
     print('Передаем данные\n')
@@ -115,7 +115,7 @@ def send_data_to_server(crypted_data: bytes) -> None:
     client.sendall(crypted_data)
     client.send(b'<EOFD>')
     client.close()
-    print('Данные переданы успешно\n')
+    print('[INFO] Данные переданы успешно\n')
 
 
 def server_exit_program() -> None:
@@ -127,13 +127,13 @@ def server_exit_program() -> None:
     try:
         client.connect((CLIENT_IP, CLIENT_PORT))  # коннектимся по ип и по порту
     except ConnectionRefusedError:
-        print('Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
+        print('[ERROR] Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
         return
 
     # шифруем ключ, получаем шифрованный ключ и nonce
     cr_key, nonce = crypt_data(SRV_TURNOFF_KEY.decode(encoding='UTF-8'))
 
-    print('Передаем последовательность отключения')
+    print('[INFO] Передаем последовательность отключения')
     client.sendall(b'<ESCOF>' + nonce + cr_key + b'</ESCOF>')
 
 
@@ -149,9 +149,9 @@ def srv_read_json(json_file) -> dict:
             try:
                 data = json.load(fl)
             except json.JSONDecodeError:
-                print('Данные в файле повреждены и не могут быть считаны. Файл будет перезаписан на этапе записи.')
+                print('[ERROR] Данные в файле повреждены и не могут быть считаны. Файл будет перезаписан на этапе записи.')
     except FileNotFoundError:
-        print('Файла с данными нет. Он будет создан на этапе записи.')
+        print('[INFO] Файла с данными нет. Он будет создан на этапе записи.')
     return data
 
 
@@ -168,5 +168,5 @@ def srv_write_json(json_file, cur_data: dict, new_data: dict) -> None:
         with open(json_file, 'w', encoding='UTF-8') as fl:
             json.dump(cur_data, fl, indent=3)
     except:
-        print(f'Не удалось создать файл. Возможно переменная конфигурации SRV_RECORDS_FILE задана наверно\n'
+        print(f'[ERROR] Не удалось создать файл. Возможно переменная конфигурации SRV_RECORDS_FILE задана наверно\n'
               f'SRV_RECORDS_FILE = {json_file}')

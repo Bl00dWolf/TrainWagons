@@ -14,7 +14,9 @@ while True:
     client, ip_addr = server.accept()  # Принимаем коннект
 
     crypt_data = b''  # для хранения данных
-    done = False  # флаг
+    done = False  # флаг завершения передачи данных
+    turn_off = False  # флаг если пришла команда выключения
+
     while not done:  # пока идет передача, т.е. пока флаг False
         data = client.recv(1024)  # принимаем по 1024 байт
         if data.endswith(b'<EOFD>'):  # если видим <EOFD> значит данные закончили передавать
@@ -24,12 +26,12 @@ while True:
                 key = funcs.decrypt_data(data[32 + 7:-8], data[7:32 + 7])  # пробуем получить ключ, расшифровываем его
                 if key.encode(encoding='UTF-8') == SRV_TURNOFF_KEY:  # сверяем верный ли ключ на завершение программы
                     print('[ACTION] !!! Получена команда на завершение работы программы !!!')
-                    done = True
+                    done, turn_off = True, True
             except:
                 pass
         crypt_data += data  # записываем текущую порцию данных
 
-    if data.startswith(b'<ESCOF>'):  # если последовательность завершения, то заканчиваем программу
+    if turn_off:  # если последовательность завершения, то заканчиваем программу
         break
     client.close()  # закрываем коннект с клиентом текущий
 
