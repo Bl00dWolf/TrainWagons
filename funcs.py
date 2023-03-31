@@ -59,9 +59,9 @@ def get_data_from_QRCode_image(filename: str) -> str:
 def crypt_data(data: str) -> tuple[bytes, bytes]:
     """
     Шифрует данные (в виде строки) с помощью AES с применением заданного ключа и возвращает зашифрованную
-    последовательность байт
+    последовательность байт и nonce
     :param data: принимает строку с данными
-    :return: возвращает зашифрованную последовательность байт
+    :return: возвращает зашифрованную последовательность байт и сгенерированный nonce (32 байта) в виде tuple
     """
     cipher = AES.new(AES_KEY, AES.MODE_EAX, get_random_bytes(32))
     return cipher.encrypt(data.encode(encoding='UTF-8')), cipher.nonce
@@ -69,7 +69,7 @@ def crypt_data(data: str) -> tuple[bytes, bytes]:
 
 def decrypt_data(data: bytes, nonce: bytes) -> str:
     """
-    Расшифровывает данные (в виде последовательности байтов) с помощью AES с применением заданного ключа
+    Расшифровывает данные (в виде последовательности байтов) с помощью AES с применением заданного ключа и nonce
     и возвращает расшифрованную строку
     :param nonce: сессионный nonce в виде байт 16 или 32 байта
     :param data: принимает зашифрованную строку в виде последовательности байт
@@ -129,8 +129,12 @@ def server_exit_program() -> None:
     except ConnectionRefusedError:
         print('Не удалось установить соединение с сервером. Проверьте данные для подключения\n')
         return
+
+    # шифруем ключ, получаем шифрованный ключ и nonce
+    cr_key, nonce = crypt_data(SRV_TURNOFF_KEY.decode(encoding='UTF-8'))
+
     print('Передаем последовательность отключения')
-    client.sendall(b'<ESCOF>' + SRV_TURNOFF_KEY + b'</ESCOF>')
+    client.sendall(b'<ESCOF>' + nonce + cr_key + b'</ESCOF>')
 
 
 def srv_read_json(json_file) -> dict:

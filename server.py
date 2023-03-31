@@ -17,11 +17,16 @@ while True:
     done = False  # флаг
     while not done:  # пока идет передача, т.е. пока флаг False
         data = client.recv(1024)  # принимаем по 1024 байт
-        if data[-6:] == b'<EOFD>':  # если видим <EOFD> значит данные закончили передавать
+        if data.endswith(b'<EOFD>'):  # если видим <EOFD> значит данные закончили передавать
             done = True
-        elif data == (b'<ESCOF>' + SRV_TURNOFF_KEY + b'</ESCOF>'):
-            print('!!! Получена команда на завершение работы программы !!!')
-            done = True
+        elif data.startswith(b'<ESCOF>') and data.endswith(b'</ESCOF>'):  # смотрим если команда завершения
+            try:
+                key = funcs.decrypt_data(data[32 + 7:-8], data[7:32 + 7])  # пробуем получить ключ, расшифровываем его
+                if key.encode(encoding='UTF-8') == SRV_TURNOFF_KEY:  # сверяем верный ли ключ на завершение программы
+                    print('[ACTION] !!! Получена команда на завершение работы программы !!!')
+                    done = True
+            except:
+                pass
         crypt_data += data  # записываем текущую порцию данных
 
     if data.startswith(b'<ESCOF>'):  # если последовательность завершения, то заканчиваем программу
